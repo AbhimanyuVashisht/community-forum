@@ -3,26 +3,32 @@ const express = require('express');
 const path = require('path');
 const app = express();
 
-let http = require('http').Server(app)
+let http = require('http').createServer(app)
     , io = require('socket.io')(http);
 
-
+app.set('view-engine', 'ejs');
+//Routing
+app.use(express.static(path.join(__dirname, 'public')));
 
 app.get('/', (req, res)=>{
-   res.sendFile(__dirname + '/views/index.html');
+   res.sendFile(path.join(__dirname + '/views', 'index.html'));
 });
 
+let numUsers = 0;
+
 io.on('connection', (socket)=>{
-    // console.log(socket);
-    console.log('a user connected');
-    // Each user firea a special disconnect event
-    socket.on('disconnect', ()=>{
-        console.log('user disconnected');
-    });
-    // Custom event
-    socket.on('chat message', (msg)=>{
-        // console.log('message ' + msg );
-        io.emit('chat message', msg);
+    let addedUser = false;
+
+    // When the client emits 'add user', this listens and executes
+    socket.on('add user', (username)=>{
+        if (addedUser) return;
+
+        // we store the username in the socket session for this client
+        socket.username = username;
+        ++numUsers;
+        addedUser = true;
+
+
     })
 });
 
