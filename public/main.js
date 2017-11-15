@@ -1,4 +1,7 @@
 $(()=>{
+    let FADE_TIME = 150; // ms
+
+
     // Initialize variables
     let $window = $(window);
     let $usernameInput = $('.usernameInput'); // Input for username
@@ -16,6 +19,16 @@ $(()=>{
 
 
     let socket = io();
+
+    function addParticipantMessage(data) {
+        let message = '';
+        if(data.numUsers === 1){
+            message += "there's 1 participant";
+        }else{
+            message += "there are " + data.numUsers + " participants";
+        }
+        log(message);
+    }
 
     // Sets the client's username
     function setUsername() {
@@ -37,6 +50,12 @@ $(()=>{
         addMessageElement($el, options);
     }
 
+
+    // Adds a message element to the messages and scrolls to the bottom
+    // el - The element to add as a message
+    // options.fade - If the element should fade-in (default = true)
+    // options.prepend - If the element should prepend
+    //   all other messages (default = false)
     function addMessageElement(el, options) {
         let $el = $(el);
 
@@ -44,8 +63,25 @@ $(()=>{
         if(!options){
             options = {};
         }
-        
+        if(typeof options.fade === 'undefined'){
+            options.fade = true;
+        }
+        if(typeof options.prepend === 'undefined'){
+            options.prepend = false;
+        }
+
+        // Apply options
+        if(options.fade){
+            $el.hide().fadeIn(FADE_TIME);
+        }
+        if(options.prepend){
+            $messages.prepend($el);
+        }else{
+            $messages.append($el);
+        }
+        $messages[0].scrollTop = $messages[0].scrollHeight;
     }
+    // Prevent input from having injected markup
     function cleanInput(input) {
         return $('<div/>').text(input).html();
     }
@@ -76,7 +112,15 @@ $(()=>{
        connected = true;
        // Display the welcome message
         let message = "Welcome to Artist-Hub Community - ";
-
-
+        log(message, {
+            prepend: true
+        });
+        addParticipantMessage(data);
     });
+
+    // Whenever the server emits 'user joined', log it in the chat body
+    socket.on('user joined', (data)=>{
+        log(data.username + ' joined');
+        addParticipantMessage(data);
+    })
 });

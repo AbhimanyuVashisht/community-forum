@@ -27,6 +27,13 @@ io.on('connection', (socket)=>{
         socket.username = username;
         ++numUsers;
         addedUser = true;
+        socket.emit('login', {
+            numUsers: numUsers
+        });
+        socket.broadcast.emit('user joined', {
+            username: socket.username,
+            numUsers: numUsers
+        })
 
 
     })
