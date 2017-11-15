@@ -44,10 +44,37 @@ $(()=>{
         }
     }
 
+    // Send a chat message
+    function sendMessage() {
+        let message = $inputMessage.val();
+        // Prevent markup from being injected into the message
+        message = cleanInput(message);
+
+        if(message && connected){
+            $inputMessage.val('');
+            addChatMessage({
+                username: username,
+                message: message
+            });
+            socket.emit('new message', message);
+        }
+    }
     // Log a message
     function log(message, options) {
         let $el = $('<li>').addClass('log').text(message);
         addMessageElement($el, options);
+    }
+
+    // Adds the visual chat message to the message list
+    function addChatMessage(data, options) {
+        // Don't fade the message in if there is an 'X was typing'
+        let $typingMessages =  getTypingMessages(data);
+        options = options || {};
+        if($typingMessages.length !== 0){
+            options.fade = false;
+            $typingMessages.remove();
+        }
+
     }
 
 
@@ -86,6 +113,13 @@ $(()=>{
         return $('<div/>').text(input).html();
     }
 
+    // Gets the 'X is typing' messages of a user
+    function getTypingMessages(data) {
+        return $('.typing.messages').filter((i)=>{
+            return $(this).data(username) === data.username;
+        });
+    }
+
 
     // Keyboard events
 
@@ -98,7 +132,10 @@ $(()=>{
         if(event.which === 13){
             if(username){
                 // TODO: config the control flow
-                console.log(username);
+                sendMessage();
+                // console.log(username);
+                socket.emit('stop typing');
+                typing = false;
             }else {
                 setUsername();
             }
@@ -118,9 +155,14 @@ $(()=>{
         addParticipantMessage(data);
     });
 
+    // Whenever the server emits 'new message', update the chat body
+    socket.on('new message', (data)=>{
+       addChatMessage(data);
+    });
+
     // Whenever the server emits 'user joined', log it in the chat body
     socket.on('user joined', (data)=>{
         log(data.username + ' joined');
         addParticipantMessage(data);
-    })
+    });
 });
