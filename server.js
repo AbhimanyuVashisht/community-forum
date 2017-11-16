@@ -26,6 +26,7 @@ let chatRoom = []; // Array to store the messages TODO: add the support of the d
 // TODO: chatBot to fetch the session periodically from the db and store it as a log
 
 let users = {}; // To store the logged in user as a key-value pair
+let userList = []; // To store the list of online users
 io.on('connection', (socket)=>{
     let addedUser = false;
 
@@ -63,15 +64,18 @@ io.on('connection', (socket)=>{
     socket.on('add user', (username)=>{
         if (addedUser) return;
 
-        // console.log(socket.id);
         users[username] = socket.id;
+
+        // push the username of the loggedIn user in the userList
+        userList.push(username);
 
         // we store the username in the socket session for this client
         socket.username = username;
         ++numUsers;
         addedUser = true;
         socket.emit('login', {
-            numUsers: numUsers
+            numUsers: numUsers,
+            userList: userList
         });
         chatRoom.push({
             username: socket.username,
@@ -83,7 +87,8 @@ io.on('connection', (socket)=>{
         // echo globally (all clients) that a person has connected
         socket.broadcast.emit('user joined', {
             username: socket.username,
-            numUsers: numUsers
+            numUsers: numUsers,
+            userList: userList
         });
     });
 
@@ -105,6 +110,9 @@ io.on('connection', (socket)=>{
         if (addedUser) {
             --numUsers;
 
+            // remove the username of the logged of user from the userList
+            userList.splice(userList.indexOf(socket.username), 1);
+
             chatRoom.push({
                 username: socket.username,
                 message: 'left'
@@ -117,7 +125,8 @@ io.on('connection', (socket)=>{
             // echo globally that this client has left
             socket.broadcast.emit('user left', {
                 username: socket.username,
-                numUsers: numUsers
+                numUsers: numUsers,
+                userList: userList
             });
         }
     });

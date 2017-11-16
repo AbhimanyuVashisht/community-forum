@@ -12,6 +12,7 @@ $(function() {
     let $usernameInput = $('.usernameInput'); // Input for username
     let $messages = $('.messages'); // Messages area
     let $inputMessage = $('.inputMessage'); // Input message input box
+    let $onlineUser = $('.userList'); // Online user list
 
     let $loginPage = $('.login.page'); // The login page
     let $chatPage = $('.chat.page'); // The chatroom page
@@ -210,6 +211,14 @@ $(function() {
         return COLORS[index];
     }
 
+    // To update the Online userList
+    function updateOnlineUserList (userList) {
+        $onlineUser.empty();
+        for( let i of userList){
+              $onlineUser.append($('<li/>').text(i));
+        }
+    }
+
     // Keyboard events
 
     $window.keydown(function (event) {
@@ -256,6 +265,7 @@ $(function() {
             prepend: true
         });
         addParticipantsMessage(data);
+        updateOnlineUserList(data.userList);
     });
 
     // Whenever the server emits 'new message', update the chat body
@@ -271,6 +281,7 @@ $(function() {
     socket.on('user joined', function (data) {
         log(data.username + ' joined');
         addParticipantsMessage(data);
+        updateOnlineUserList(data.userList);
     });
 
     // Whenever the server emits 'user left', log it in the chat body
@@ -278,6 +289,7 @@ $(function() {
         log(data.username + ' left');
         addParticipantsMessage(data);
         removeChatTyping(data);
+        updateOnlineUserList(data.userList);
     });
 
     // Whenever the server emits 'typing', show the typing message
