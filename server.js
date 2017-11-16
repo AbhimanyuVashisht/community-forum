@@ -10,6 +10,9 @@ let http = require('http').createServer(app)
 
 // let chat = io.of('/chat');
 
+const fs =require('fs');
+let date = new Date();
+
 app.set('view-engine', 'ejs');
 //Routing
 app.use(express.static(path.join(__dirname, 'public')));
@@ -34,6 +37,9 @@ io.on('connection', (socket)=>{
             message: data
         });
 
+        fs.appendFile('chatlog/communityLog.txt', '\n[' + date + '] '+socket.username + ': ' + data, (err)=>{
+           if(err) throw err;
+        });
         socket.broadcast.emit('new message', {
             username: socket.username,
             message: data

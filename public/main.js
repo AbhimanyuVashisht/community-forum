@@ -82,28 +82,28 @@ $(function() {
 
     // Log a message
     function log (message, options) {
-        var $el = $('<li>').addClass('log').text(message);
+        let $el = $('<li>').addClass('log').text(message);
         addMessageElement($el, options);
     }
 
     // Adds the visual chat message to the message list
     function addChatMessage (data, options) {
         // Don't fade the message in if there is an 'X was typing'
-        var $typingMessages = getTypingMessages(data);
+        let $typingMessages = getTypingMessages(data);
         options = options || {};
         if ($typingMessages.length !== 0) {
             options.fade = false;
             $typingMessages.remove();
         }
 
-        var $usernameDiv = $('<span class="username"/>')
+        let $usernameDiv = $('<span class="username"/>')
             .text(data.username)
             .css('color', getUsernameColor(data.username));
-        var $messageBodyDiv = $('<span class="messageBody">')
+        let $messageBodyDiv = $('<span class="messageBody">')
             .text(data.message);
 
-        var typingClass = data.typing ? 'typing' : '';
-        var $messageDiv = $('<li class="message"/>')
+        let typingClass = data.typing ? 'typing' : '';
+        let $messageDiv = $('<li class="message"/>')
             .data('username', data.username)
             .addClass(typingClass)
             .append($usernameDiv, $messageBodyDiv);
@@ -141,7 +141,7 @@ $(function() {
     // options.prepend - If the element should prepend
     //   all other messages (default = false)
     function addMessageElement (el, options) {
-        var $el = $(el);
+        let $el = $(el);
 
         // Setup default options
         if (!options) {
@@ -181,8 +181,8 @@ $(function() {
             lastTypingTime = (new Date()).getTime();
 
             setTimeout(function () {
-                var typingTimer = (new Date()).getTime();
-                var timeDiff = typingTimer - lastTypingTime;
+                let typingTimer = (new Date()).getTime();
+                let timeDiff = typingTimer - lastTypingTime;
                 if (timeDiff >= TYPING_TIMER_LENGTH && typing) {
                     socket.emit('stop typing');
                     typing = false;
@@ -201,12 +201,12 @@ $(function() {
     // Gets the color of a username through our hash function
     function getUsernameColor (username) {
         // Compute hash code
-        var hash = 7;
-        for (var i = 0; i < username.length; i++) {
+        let hash = 7;
+        for (let i = 0; i < username.length; i++) {
             hash = username.charCodeAt(i) + (hash << 5) - hash;
         }
         // Calculate color
-        var index = Math.abs(hash % COLORS.length);
+        let index = Math.abs(hash % COLORS.length);
         return COLORS[index];
     }
 
@@ -251,7 +251,7 @@ $(function() {
     socket.on('login', function (data) {
         connected = true;
         // Display the welcome message
-        var message = "Welcome to Artist-Hub Chat – ";
+        let message = "Welcome to Artist-Hub Chat – ";
         log(message, {
             prepend: true
         });
