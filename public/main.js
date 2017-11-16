@@ -1,32 +1,32 @@
 $(function() {
     let FADE_TIME = 150; // ms
-    var TYPING_TIMER_LENGTH = 400; // ms
-    var COLORS = [
+    let TYPING_TIMER_LENGTH = 400; // ms
+    let COLORS = [
         '#e21400', '#91580f', '#f8a700', '#f78b00',
         '#58dc00', '#287b00', '#a8f07a', '#4ae8c4',
         '#3b88eb', '#3824aa', '#a700ff', '#d300e7'
     ];
 
     // Initialize variables
-    var $window = $(window);
-    var $usernameInput = $('.usernameInput'); // Input for username
-    var $messages = $('.messages'); // Messages area
-    var $inputMessage = $('.inputMessage'); // Input message input box
+    let $window = $(window);
+    let $usernameInput = $('.usernameInput'); // Input for username
+    let $messages = $('.messages'); // Messages area
+    let $inputMessage = $('.inputMessage'); // Input message input box
 
-    var $loginPage = $('.login.page'); // The login page
-    var $chatPage = $('.chat.page'); // The chatroom page
+    let $loginPage = $('.login.page'); // The login page
+    let $chatPage = $('.chat.page'); // The chatroom page
 
     // Prompt for setting a username
-    var username;
-    var connected = false;
-    var typing = false;
-    var lastTypingTime;
-    var $currentInput = $usernameInput.focus();
+    let username;
+    let connected = false;
+    let typing = false;
+    let lastTypingTime;
+    let $currentInput = $usernameInput.focus();
 
-    var socket = io();
+    let socket = io();
 
     function addParticipantsMessage (data) {
-        var message = '';
+        let message = '';
         if (data.numUsers === 1) {
             message += "there's 1 participant";
         } else {
@@ -53,19 +53,30 @@ $(function() {
 
     // Sends a chat message
     function sendMessage () {
-        var message = $inputMessage.val();
+        let message = $inputMessage.val();
+
         // Prevent markup from being injected into the message
         message = cleanInput(message);
+
+
+
 
         // if there is a non-empty message and a socket connection
         if (message && connected) {
             $inputMessage.val('');
-            addChatMessage({
-                username: username,
-                message: message
-            });
-            // tell server to execute 'new message' and send along one parameter
-            socket.emit('new message', message);
+            if(message[0] === '@'){
+                sendPrivateMessage({
+                    username: username,
+                    message: message
+                });
+            }else{
+                addChatMessage({
+                    username: username,
+                    message: message
+                });
+                // tell server to execute 'new message' and send along one parameter
+                socket.emit('new message', message);
+            }
         }
     }
 
@@ -100,6 +111,16 @@ $(function() {
         addMessageElement($messageDiv, options);
     }
 
+    // To send Private message
+    function sendPrivateMessage(data, options) {
+        let message = data.message.split('@')[1];
+        let receiver = message.split(' ')[0];
+        socket.emit('private message', {
+            username: data.username,
+            receiver: receiver,
+            message: data.message
+        });
+    }
     // Adds the visual chat typing message
     function addChatTyping (data) {
         data.typing = true;
@@ -230,7 +251,7 @@ $(function() {
     socket.on('login', function (data) {
         connected = true;
         // Display the welcome message
-        var message = "Welcome to Artist-Hubg Chat – ";
+        var message = "Welcome to Artist-Hub Chat – ";
         log(message, {
             prepend: true
         });
@@ -240,6 +261,10 @@ $(function() {
     // Whenever the server emits 'new message', update the chat body
     socket.on('new message', function (data) {
         addChatMessage(data);
+    });
+
+    socket.on('private message', function (data) {
+       addChatMessage(data);
     });
 
     // Whenever the server emits 'user joined', log it in the chat body
