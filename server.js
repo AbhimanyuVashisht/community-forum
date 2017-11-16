@@ -53,6 +53,7 @@ io.on('connection', (socket)=>{
     });
 
     socket.on('stop typing', ()=>{
+        console.log(' stop typing');
         socket.broadcast.emit('stop typing', {
           username: socket.username
         });
@@ -70,7 +71,6 @@ io.on('connection', (socket)=>{
             });
         }
     });
-
 });
 
 http.listen(3000, function(){
