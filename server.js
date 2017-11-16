@@ -2,7 +2,7 @@
 const express = require('express');
 const path = require('path');
 const app = express();
-
+let port = process.env.PORT || 3000;
 // let datetime =  require('node-datetime');
 
 let http = require('http').createServer(app)
@@ -116,6 +116,6 @@ io.on('connection', (socket)=>{
     });
 });
 
-http.listen(3000, function(){
+http.listen(port, function(){
     console.log("ServerRunning on http://localhost:3000/");        
 });
