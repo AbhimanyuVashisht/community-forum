@@ -77,6 +77,9 @@ io.on('connection', (socket)=>{
             username: socket.username,
             message: 'joined'
         });
+        fs.appendFile('chatlog/communityLog.txt', '\n[' + date + '] '+ socket.username + ' joined', (err)=>{
+            if(err) throw err;
+        });
         // echo globally (all clients) that a person has connected
         socket.broadcast.emit('user joined', {
             username: socket.username,
@@ -107,6 +110,10 @@ io.on('connection', (socket)=>{
                 message: 'left'
             });
 
+
+            fs.appendFile('chatlog/communityLog.txt', '\n[' + date + '] '+ socket.username + ' left', (err)=>{
+                if(err) throw err;
+            });
             // echo globally that this client has left
             socket.broadcast.emit('user left', {
                 username: socket.username,
