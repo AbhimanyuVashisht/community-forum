@@ -48,7 +48,7 @@ $(function() {
             $currentInput = $inputMessage.focus();
 
             // Tell the server your username
-            socket.emit('add user', username);
+            socket.emit('add user', {username:username, room: window.location.pathname});
         }
     }
 
@@ -258,6 +258,7 @@ $(function() {
 
     // Whenever the server emits 'login', log the login message
     socket.on('login', function (data) {
+        console.log(data);
         connected = true;
         // Display the welcome message
         let message = "Welcome to Artist-Hub Chat – ";
@@ -309,7 +310,7 @@ $(function() {
     socket.on('reconnect', function () {
         log('you have been reconnected');
         if (username) {
-            socket.emit('add user', username);
+            socket.emit('add user', {username:username, room: window.location.pathname});
         }
     });
 
