@@ -38,6 +38,7 @@ io.on('connection', (socket)=>{
     socket.on('new message', (data)=>{
 
         console.log(rooms[socket.id] + 'connection');
+        console.log(rooms);
         chatRoom.push({
             username: socket.username,
             message: data
@@ -47,7 +48,8 @@ io.on('connection', (socket)=>{
            if(err) throw err;
         });
 
-        socket.to(rooms[socket.id]).broadcast.emit('new message', {
+        console.log(rooms[socket.id]);
+        socket.to(rooms[socket.id]).emit('new message', {
             username: socket.username,
             message: data
         });
@@ -71,13 +73,14 @@ io.on('connection', (socket)=>{
         if (addedUser) return;
 
         console.log(socket.id + '                    '  + data.username);
-        // console.log(socket.adapter.rooms);
+        // Joining the room specified in the namespace
+        socket.join(data.room);
+
         rooms[socket.id] = data.room; // key-value pair linking socket.id to rooms
 
         //To store the Online users for each room
-
         if(roomsMap[data.room] !== undefined){
-            console.log(roomsMap[data.room]);
+            // console.log(roomsMap[data.room]);
           userList[roomsMap[data.room]].push(data.username);
         }else {
             roomsMap[data.room] = numRooms++;
@@ -89,9 +92,6 @@ io.on('connection', (socket)=>{
 
         users[data.username] = socket.id;
 
-        // users[data.room][data.username] = socket.id;
-        // push the username of the loggedIn user in the userList
-        // userList.push(data.username);
 
         // we store the username in the socket session for this client
         socket.username = data.username;
@@ -116,7 +116,7 @@ io.on('connection', (socket)=>{
         });
 
         // echo globally (all clients) that a person has connected
-        socket.to(rooms[socket.id]).broadcast.emit('user joined', {
+        socket.to(rooms[socket.id]).emit('user joined', {
             username: socket.username,
             numUsers: userList[roomsMap[data.room]].length,
             userList: userList[roomsMap[data.room]]
@@ -125,13 +125,13 @@ io.on('connection', (socket)=>{
 
     // When the client emit 'typing', we broadcast it to other
     socket.on('typing', ()=>{
-        socket.to(rooms[socket.id]).broadcast.emit('typing', {
+        socket.to(rooms[socket.id]).emit('typing', {
             username: socket.username
         });
     });
 
     socket.on('stop typing', ()=>{
-        socket.to(rooms[socket.id]).broadcast.emit('stop typing', {
+        socket.to(rooms[socket.id]).emit('stop typing', {
           username: socket.username
         });
     });
@@ -141,10 +141,6 @@ io.on('connection', (socket)=>{
         if (addedUser) {
             --numUsers;
 
-            console.log(socket.id);
-            console.log(roomsMap);
-            console.log(rooms[socket.id]);
-            console.log(roomsMap[rooms[socket.id]]);
             // remove the username of the logged of user from the userList
             userList[roomsMap[rooms[socket.id]]].splice(userList.indexOf(socket.username), 1);
 
@@ -157,8 +153,9 @@ io.on('connection', (socket)=>{
             fs.appendFile('chatlog/' + rooms[socket.id].split('/')[1], '\n[' + date + '] '+ socket.username + ' left', (err)=>{
                 if(err) throw err;
             });
+
             // echo globally that this client has left
-            socket.to(rooms[socket.id]).broadcast.emit('user left', {
+            socket.to(rooms[socket.id]).emit('user left', {
                 username: socket.username,
                 numUsers: numUsers,
                 userList: userList

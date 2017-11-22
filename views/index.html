@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <title>Artist-Hub</title>
     <link rel="stylesheet" href="style.css">
+
+    <script src="https://code.jquery.com/jquery-3.2.1.js"></script>
 </head>
 <body>
 <ul class="pages">
@@ -12,6 +14,7 @@
             <ul class="messages"></ul>
         </div>
         <div class="online">
+            <h3>Online Users</h3>
             <ul class="userList"></ul>
         </div>
         <input class="inputMessage" placeholder="Type here..."/>
@@ -24,7 +27,6 @@
     </li>
 </ul>
 
-<script src="https://code.jquery.com/jquery-3.2.1.js"></script>
 <script src="/socket.io/socket.io.js"></script>
 <script src="/main.js"></script>
 </body>
