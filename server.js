@@ -18,7 +18,7 @@ app.set('view-engine', 'ejs');
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', (req, res)=>{
-   res.sendFile(path.join(__dirname + '/views', 'index.html'));
+   res.sendFile(path.join(__dirname + '/views', 'indexchat.html'));
 });
 
 let numUsers = 0; // To store the count of the number of users connected
@@ -72,7 +72,6 @@ io.on('connection', (socket)=>{
     socket.on('add user', (data)=>{
         if (addedUser) return;
 
-        console.log(socket.id + '                    '  + data.username);
         // Joining the room specified in the namespace
         socket.join(data.room);
 
@@ -90,6 +89,7 @@ io.on('connection', (socket)=>{
         console.log(userList);
 
 
+        // Mapping username to socketID
         users[data.username] = socket.id;
 
 
@@ -98,13 +98,13 @@ io.on('connection', (socket)=>{
         ++numUsers;
         addedUser = true;
 
-        console.log(rooms[socket.id]);
 
         socket.emit('login', {
             numUsers: userList[roomsMap[data.room]].length,
             userList: userList[roomsMap[data.room]]
         });
 
+        // In-future hopping to retrieve the chat
         chatRoom.push({
             username: socket.username,
             message: 'joined'
@@ -154,11 +154,12 @@ io.on('connection', (socket)=>{
                 if(err) throw err;
             });
 
+
             // echo globally that this client has left
             socket.to(rooms[socket.id]).emit('user left', {
                 username: socket.username,
-                numUsers: numUsers,
-                userList: userList
+                numUsers: userList[roomsMap[rooms[socket.id]]].length,
+                userList: userList[roomsMap[rooms[socket.id]]]
             });
         }
     });
