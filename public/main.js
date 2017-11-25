@@ -261,7 +261,11 @@ $(function() {
         console.log(data);
         connected = true;
         // Display the welcome message
-        let message = "Welcome to Artist-Hub Chat – ";
+        let RoomName = window.location.pathname.split('/')[1];
+        if(!RoomName){
+            RoomName = '';
+        }
+        let message = "Welcome to ArtLine Chat – " +  RoomName + ' Channel';
         log(message, {
             prepend: true
         });

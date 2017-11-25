@@ -2,32 +2,47 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Artist-Hub</title>
-    <link rel="stylesheet" href="style.css">
-
+    <title>ArtLine-Chat</title>
+    <link rel="stylesheet" href="stylechat.css">
+    <!--Jquery cdn-->
     <script src="https://code.jquery.com/jquery-3.2.1.js"></script>
+    <!--Socket.io JS-->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.4/socket.io.js"></script>
 </head>
 <body>
 <ul class="pages">
     <li class="chat page">
-        <div class="chatArea">
-            <ul class="messages"></ul>
+        <div class="left-pane">
+            <div class="chatArea">
+                <ul class="messages"></ul>
+            </div>
+            <input class="inputMessage" placeholder="Type here..." />
         </div>
-        <div class="online">
-            <h3>Online Users</h3>
-            <ul class="userList"></ul>
+        <div class="right-pane">
+            <div class="online">
+                <div>
+                    <h4>Users Online</h4>
+                </div>
+                <ul class="userList">bsa</ul>
+            </div>
+            <hr>
+            <div class="group-actve">
+                <div>
+                    <h4>Active Groups</h4>
+                </div>
+                <ul class="userList">bsa</ul>
+            </div>
         </div>
-        <input class="inputMessage" placeholder="Type here..."/>
     </li>
     <li class="login page">
         <div class="form">
+            <h2 class="cname">ArtLine-Community Server</h2>
             <h3 class="title">What's your nickname?</h3>
             <input class="usernameInput" type="text" maxlength="14" />
         </div>
     </li>
 </ul>
 
-<script src="/socket.io/socket.io.js"></script>
 <script src="/main.js"></script>
 </body>
 </html>

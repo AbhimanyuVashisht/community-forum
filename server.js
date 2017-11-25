@@ -18,7 +18,7 @@ app.set('view-engine', 'ejs');
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', (req, res)=>{
-   res.sendFile(path.join(__dirname + '/views', 'indexchat.html'));
+   res.sendFile(path.join(__dirname + '/views', 'index.html'));
 });
 
 let numUsers = 0; // To store the count of the number of users connected
@@ -71,6 +71,8 @@ io.on('connection', (socket)=>{
     // When the client emits 'add user', this listens and executes
     socket.on('add user', (data)=>{
         if (addedUser) return;
+
+        console.log(socket.adapter.rooms);
 
         // Joining the room specified in the namespace
         socket.join(data.room);
