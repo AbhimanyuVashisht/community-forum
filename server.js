@@ -146,6 +146,7 @@ io.on('connection', (socket)=>{
         });
     });
 
+    // When the client emit 'stop typing', we broadcast it to other sockets
     socket.on('stop typing', ()=>{
         socket.to(rooms[socket.id]).emit('stop typing', {
           username: socket.username
@@ -166,7 +167,7 @@ io.on('connection', (socket)=>{
             });
 
 
-            // file to write the log
+            // file to write the log logic
             let logFilename;
             if(rooms[socket.id] === '/'){
                 logFilename = 'commonlog';
@@ -185,6 +186,20 @@ io.on('connection', (socket)=>{
                 numUsers: userList[roomsMap[rooms[socket.id]]].length,
                 userList: userList[roomsMap[rooms[socket.id]]]
             });
+
+            // Logic to eliminate the unactive channel from the roomMaps and userList
+            if(userList[roomsMap[rooms[socket.id]]].length === 0){
+                console.log(rooms[socket.id] + ' Empty room');
+                userList.splice(roomsMap[rooms[socket.id]], 1); // splicing it out from the userList
+                delete roomsMap[rooms[socket.id]]; // deleting the Empty room key from the roomsMap
+                numRooms--;
+                console.log(userList);
+                let indexRoomMaps = 0; // to reindex the roomMaps to the current userList
+                for( let i in roomsMap){
+                    roomsMap[i] = indexRoomMaps++;
+                }
+                console.log(roomsMap);
+            }
         }
     });
 });
