@@ -72,8 +72,6 @@ io.on('connection', (socket)=>{
     socket.on('add user', (data)=>{
         if (addedUser) return;
 
-        console.log(socket.adapter.rooms);
-
         // Joining the room specified in the namespace
         socket.join(data.room);
 
