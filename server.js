@@ -39,12 +39,21 @@ io.on('connection', (socket)=>{
 
         console.log(rooms[socket.id] + 'connection');
         console.log(rooms);
+
         chatRoom.push({
             username: socket.username,
             message: data
         });
 
-        fs.appendFile('chatlog/'+ rooms[socket.id].split('/')[1], '\n[' + date + '] '+socket.username + ': ' + data, (err)=>{
+        // file to write the log
+        let logFilename;
+        if(rooms[socket.id] === '/'){
+            logFilename = 'commonlog';
+        }else{
+            logFilename = rooms[socket.id].split('/')[1];
+        }
+
+        fs.appendFile('chatlog/'+ logFilename, '\n[' + date + '] '+socket.username + ': ' + data, (err)=>{
            if(err) throw err;
         });
 
@@ -110,8 +119,15 @@ io.on('connection', (socket)=>{
             message: 'joined'
         });
 
+        // file to write the log
+        let logFilename;
+        if(rooms[socket.id] === '/'){
+            logFilename = 'commonlog';
+        }else{
+            logFilename = rooms[socket.id].split('/')[1];
+        }
 
-        fs.appendFile('chatlog/'+ rooms[socket.id].split('/')[1], '\n[' + date + '] '+ socket.username + ' joined', (err)=>{
+        fs.appendFile('chatlog/'+ logFilename, '\n[' + date + '] '+ socket.username + ' joined', (err)=>{
             if(err) throw err;
         });
 
@@ -150,7 +166,15 @@ io.on('connection', (socket)=>{
             });
 
 
-            fs.appendFile('chatlog/' + rooms[socket.id].split('/')[1], '\n[' + date + '] '+ socket.username + ' left', (err)=>{
+            // file to write the log
+            let logFilename;
+            if(rooms[socket.id] === '/'){
+                logFilename = 'commonlog';
+            }else{
+                logFilename = rooms[socket.id].split('/')[1];
+            }
+
+            fs.appendFile('chatlog/' + logFilename, '\n[' + date + '] '+ socket.username + ' left', (err)=>{
                 if(err) throw err;
             });
 
