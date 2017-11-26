@@ -13,6 +13,7 @@ $(function() {
     let $messages = $('.messages'); // Messages area
     let $inputMessage = $('.inputMessage'); // Input message input box
     let $onlineUser = $('.userList'); // Online user list
+    let $roomList = $('.roomList'); // Active Room List
 
     let $loginPage = $('.login.page'); // The login page
     let $chatPage = $('.chat.page'); // The chatroom page
@@ -219,6 +220,14 @@ $(function() {
         }
     }
 
+    // To update the Active Channel List
+    function updateActiveRoomList(roomList) {
+        $roomList.empty();
+        for( let i of roomList){
+            $roomList.append($('<li>').text(i));
+        }
+    }
+
     // Keyboard events
 
     $window.keydown(function (event) {
@@ -305,6 +314,12 @@ $(function() {
     // Whenever the server emits 'stop typing', kill the typing message
     socket.on('stop typing', function (data) {
         removeChatTyping(data);
+    });
+
+
+    socket.on('active rooms', function (data) {
+        console.log(data);
+        updateActiveRoomList(data);
     });
 
     socket.on('disconnect', function () {

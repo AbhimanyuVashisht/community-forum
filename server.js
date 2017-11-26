@@ -31,6 +31,7 @@ let userList = []; // To store the list of online users
 
 let rooms = {}; // To store the rooms in the namespace mapping socket.id to room
 let roomsMap = {}; // Rooms map to a index to fetch the userList
+let roomList = []; // List of active rooms in the namespace
 io.on('connection', (socket)=>{
     let addedUser = false;
 
@@ -92,8 +93,13 @@ io.on('connection', (socket)=>{
           userList[roomsMap[data.room]].push(data.username);
         }else {
             roomsMap[data.room] = numRooms++;
+            roomList.push(data.room); // adding active room to the active roomList
             userList.push([data.username]);
         }
+
+        // emiting when some channel connects to the namespace
+        // emit to every socket connected (emiting the list of active rooms);
+        io.emit('active rooms', roomList);
 
         console.log(userList);
 
@@ -131,12 +137,13 @@ io.on('connection', (socket)=>{
             if(err) throw err;
         });
 
-        // echo globally (all clients) that a person has connected
+        // echo globally to all clients connected to that given channel
         socket.to(rooms[socket.id]).emit('user joined', {
             username: socket.username,
             numUsers: userList[roomsMap[data.room]].length,
             userList: userList[roomsMap[data.room]]
         });
+
     });
 
     // When the client emit 'typing', we broadcast it to other
@@ -195,10 +202,15 @@ io.on('connection', (socket)=>{
                 numRooms--;
                 console.log(userList);
                 let indexRoomMaps = 0; // to reindex the roomMaps to the current userList
+                roomList = [];
                 for( let i in roomsMap){
                     roomsMap[i] = indexRoomMaps++;
+                    roomList.push(i);
                 }
                 console.log(roomsMap);
+                // emiting when some channel becomes in-active on the namespace
+                // emit to every socket connected (emiting the list of active rooms);
+                io.emit('active rooms', roomList);
             }
         }
     });
