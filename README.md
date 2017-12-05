@@ -2,6 +2,13 @@
 
 ### Chat Application created using Socket.io
 
+### How to use ?
+* git clone https://github.com/AbhimanyuVashisht/community-forum.git
+* cd /community-forum
+* npm install
+* node server.js
+* GoTo localhost:3000/ on your web browser
+
 ### KeyFeature :
 * Their is a feature of Private Messaging, message starting with  "@< username> < space> < message>"
 * Typing feature Enabled
